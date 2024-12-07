@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consistent-cache-client-cpp
+  namespace: softclient
+spec:
+  replicas: 8 # 8 if use cache.
+  selector:
+    matchLabels:
+      app: consistent-cache-client-cpp
+  template:
+    metadata:
+      labels:
+        app: consistent-cache-client-cpp
+    spec:
+      containers:
+        - name: consistent-cache-client-cpp
+          image: registry.dev.databricks.com/universe/consistent-cache
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c", "/usr/src/app/build/client/client && tail -f /dev/null"]
+          resources:
+            limits:
+              memory: "1720Mi"
+              cpu: "2000m"
+            requests:
+              memory: "1720Mi"
+              cpu: "2000m"
+          ports:
+            - containerPort: 5051
+              protocol: TCP

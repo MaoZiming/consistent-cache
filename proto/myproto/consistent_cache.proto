@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package consistent_cache;
+
+service ConsistentCache {
+  rpc Read (ReadRequest) returns (ReadResponse);
+  rpc Write (WriteRequest) returns (WriteResponse);
+}
+
+message ReadRequest {
+  int32 key = 1;
+}
+
+message ReadResponse {
+  string value = 1;
+}
+
+message WriteRequest {
+  int32 key = 1;
+  string timestamp = 2;
+  string value = 3;
+}
+
+message WriteResponse {
+  bool success = 1;
+}

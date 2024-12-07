@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consistent-cache-server-cpp
+  namespace: softstore-storelet
+spec:
+  replicas: 5 # Number of server pods
+  selector:
+    matchLabels:
+      app: consistent-cache-server-cpp
+  template:
+    metadata:
+      labels:
+        app: consistent-cache-server-cpp
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - consistent-cache-server-cpp
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: consistent-cache-server-cpp
+          image: registry.dev.databricks.com/universe/consistent-cache
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c", "/usr/src/app/build/server/server && tail -f /dev/null"]
+          resources:
+            limits:
+              memory: "1720Mi"
+              cpu: "6000m"
+            requests:
+              memory: "1720Mi"
+              cpu: "6000m"
+          ports:
+            - containerPort: 5051
+              protocol: TCP
+          securityContext:
+            privileged: true
